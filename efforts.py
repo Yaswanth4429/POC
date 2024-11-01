@@ -84,6 +84,10 @@ if mode == "Start New" or "effort_values" not in st.session_state:
             "Gold Layer",
         ]
     }
+    if "selected_technology" not in st.session_state:
+        st.session_state["selected_technology"] = "Snowflake"  # Default technology
+    if "selected_project_type" not in st.session_state:
+        st.session_state["selected_project_type"] = "New"  # Default project type
 
 if "selected_technology" not in st.session_state:
     st.session_state["selected_technology"] = "Snowflake"  # or any default technology
@@ -175,7 +179,7 @@ default_effort_values = {
 # Load default effort values based on selection
 if mode == "Start New":
     st.session_state.effort_values.update(
-        default_effort_values[selected_project_type][selected_technology]
+        default_effort_values[st.session_state["selected_project_type"]][st.session_state["selected_technology"]]
     )
 
 
