@@ -128,7 +128,8 @@ def update_estimates():
 # Default configurations for each tech and project type
 default_effort_values = {
     "New": {
-        "Snowflake": {
+        "Snowflake": 
+        {
             "BusinessProcesses": {"S": 3, "M": 5, "L": 9},
             "SourceSystemAnalysis": {"S": 3, "M": 5, "L": 9},
             "BusinessRules": {"S": 3, "M": 5, "L": 9},
@@ -147,7 +148,8 @@ default_effort_values = {
             "Repos": {"S": 3, "M": 5, "L": 9},
             "Environment Setup": {"S": 3, "M": 5, "L": 9}
         },
-        "Azure": {
+        "MDP": 
+        {
             "BusinessProcesses": {"S": 13, "M": 5, "L": 9},
             "SourceSystemAnalysis": {"S": 13, "M": 5, "L": 9},
             "BusinessRules": {"S": 3, "M": 15, "L": 9},
@@ -166,7 +168,28 @@ default_effort_values = {
             "Repos": {"S": 13, "M": 5, "L": 9},
             "Environment Setup": {"S": 13, "M": 5, "L": 9}
         },
-        "Databricks": {
+        "Databricks": 
+        {
+            "BusinessProcesses": {"S": 23, "M": 5, "L": 9},
+            "SourceSystemAnalysis": {"S": 23, "M": 5, "L": 9},
+            "BusinessRules": {"S": 3, "M": 15, "L": 9},
+            "ConceptualDataModel": {"S": 23, "M": 5, "L": 9},
+            "LogicalDataModel": {"S": 23, "M": 5, "L": 9},
+            "Sources": {"S": 23, "M": 15, "L": 9},
+            "Read": {"S": 23, "M": 15, "L": 9},
+            "DQ": {"S": 23, "M": 5, "L": 9},
+            "Queries": {"S": 23, "M": 5, "L": 9},
+            "Write": {"S": 23, "M": 5, "L": 9},
+            "Integrations": {"S": 23, "M": 5, "L": 9},
+            "Roles": {"S": 23, "M": 5, "L": 9},
+            "Load": {"S": 23, "M": 5, "L": 9},
+            "Pipelines": {"S": 23, "M": 5, "L": 9},
+            "Views": {"S": 23, "M": 5, "L": 9},
+            "Repos": {"S": 23, "M": 5, "L": 9},
+            "Environment Setup": {"S": 23, "M": 5, "L": 9}
+        },
+        "Powered By Excel(EV2)": 
+        {
             "BusinessProcesses": {"S": 23, "M": 5, "L": 9},
             "SourceSystemAnalysis": {"S": 23, "M": 5, "L": 9},
             "BusinessRules": {"S": 3, "M": 15, "L": 9},
@@ -191,11 +214,15 @@ default_effort_values = {
             "Sources": {"S": 2, "M": 4, "L": 8},
             "Queries": {"S": 2, "M": 5, "L": 8},
         },
-        "Azure": {
+        "MDP": {
             "Sources": {"S": 3, "M": 5, "L": 9},
             "Queries": {"S": 2, "M": 5, "L": 9},
         },
         "Databricks": {
+            "Sources": {"S": 3, "M": 5, "L": 8},
+            "Queries": {"S": 2, "M": 4, "L": 6},
+        },
+        "Powered By Excel(EV2)": {
             "Sources": {"S": 3, "M": 5, "L": 8},
             "Queries": {"S": 2, "M": 4, "L": 6},
         },
@@ -248,7 +275,7 @@ def export_to_json():
 
 # Sidebar for project type and technology selection
 st.sidebar.header("Project Configuration")
-technologies = ["Snowflake", "Azure", "Databricks"]
+technologies = ["Snowflake", "Databricks", "MDP", "Powered By Excel(EV2)"]
 project_types = ["New", "Upgrade"]
 # Sidebar for project type and technology selection, reflecting session state values
 selected_technology = st.sidebar.selectbox(
@@ -302,6 +329,7 @@ with tab1:
                     step=1,
                     value=default_total_count,
                     key=f"{process}_{input_name}_count",
+                    on_change=update_estimates
                 )
                 s_percentage = col2.number_input(
                     f"{input_name} S%",
@@ -309,6 +337,7 @@ with tab1:
                     max_value=100,
                     value=default_s_percentage,
                     key=f"{process}_{input_name}_s",
+                    on_change=update_estimates
                 )
                 m_percentage = col3.number_input(
                     f"{input_name} M%",
@@ -316,6 +345,7 @@ with tab1:
                     max_value=100,
                     value=default_m_percentage,
                     key=f"{process}_{input_name}_m",
+                    on_change=update_estimates
                 )
                 l_percentage = col4.number_input(
                     f"{input_name} L%",
@@ -323,6 +353,7 @@ with tab1:
                     max_value=100,
                     value=default_l_percentage,
                     key=f"{process}_{input_name}_l",
+                    on_change=update_estimates
                 )
 
                 if s_percentage + m_percentage + l_percentage == 100:
