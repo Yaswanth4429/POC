@@ -406,13 +406,16 @@ with tab2:
     st.subheader(
         f"Effort Multipliers for {selected_project_type} Project on {selected_technology}"
     )
+    st.session_state.effort_values.update(
+        default_effort_values[st.session_state["selected_project_type"]][st.session_state["selected_technology"]]
+    )
     for category, sizes in st.session_state.effort_values.items():
         with st.container():
             col1, col2, col3, col4 = st.columns([1.5, 1, 1, 1])
             col1.write(category.capitalize())
             st.session_state.effort_values[category] = {
                 "S": col2.number_input(
-                    f"Small",
+                    f"Small ({category.capitalize()})",
                     min_value=0,
                     value=sizes["S"],
                     step=1,
