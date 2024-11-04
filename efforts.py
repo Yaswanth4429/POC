@@ -322,9 +322,9 @@ with tab1:
                     .get("L%", 30)
                 )
 
-                col1, col2, col3, col4 = st.columns([1, 1, 1, 1.5])
+                col1, col2, col3, col4 = st.columns([1, 1, 1, 1])
                 total_count = col1.number_input(
-                    f"{input_name} Total",
+                    f"Total",
                     min_value=0,
                     step=1,
                     value=default_total_count,
@@ -332,7 +332,7 @@ with tab1:
                     on_change=update_estimates
                 )
                 s_percentage = col2.number_input(
-                    f"{input_name} S%",
+                    f"S%",
                     min_value=0,
                     max_value=100,
                     value=default_s_percentage,
@@ -340,7 +340,7 @@ with tab1:
                     on_change=update_estimates
                 )
                 m_percentage = col3.number_input(
-                    f"{input_name} M%",
+                    f"M%",
                     min_value=0,
                     max_value=100,
                     value=default_m_percentage,
@@ -348,7 +348,7 @@ with tab1:
                     on_change=update_estimates
                 )
                 l_percentage = col4.number_input(
-                    f"{input_name} L%",
+                    f"L%",
                     min_value=0,
                     max_value=100,
                     value=default_l_percentage,
