@@ -412,7 +412,7 @@ with tab2:
             col1.write(category.capitalize())
             st.session_state.effort_values[category] = {
                 "S": col2.number_input(
-                    f"Small ({category.capitalize()})",
+                    f"Small",
                     min_value=0,
                     value=sizes["S"],
                     step=1,
