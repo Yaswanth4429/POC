@@ -97,37 +97,6 @@ if "selected_project_type" not in st.session_state:
 if "effort_breakdown" not in st.session_state:
     st.session_state.effort_breakdown = default_percentages
 
-def update_estimates():
-    st.session_state.effort_values.update(
-        default_effort_values[st.session_state["selected_project_type"]][st.session_state["selected_technology"]]
-    )
-    for process, inputs in process_mappings.items():
-        process_total = 0
-        for input_name, effort_key in inputs.items():
-            total_count = st.session_state[f"{process}_{input_name}_count"]
-            s_percentage = st.session_state[f"{process}_{input_name}_s"]
-            m_percentage = st.session_state[f"{process}_{input_name}_m"]
-            l_percentage = st.session_state[f"{process}_{input_name}_l"]
-            
-            # Recalculate estimates
-            s_count = total_count * (s_percentage / 100)
-            m_count = total_count * (m_percentage / 100)
-            l_count = total_count * (l_percentage / 100)
-            effort = (
-                s_count * st.session_state.effort_values[effort_key]["S"]
-                + m_count * st.session_state.effort_values[effort_key]["M"]
-                + l_count * st.session_state.effort_values[effort_key]["L"]
-            )
-
-            st.session_state.estimate_values[process][input_name] = {
-                "Effort": effort,
-                "Total Count": total_count,
-                "S%": s_percentage,
-                "M%": m_percentage,
-                "L%": l_percentage,
-            }
-
-
 # Default configurations for each tech and project type
 default_effort_values = {
     "New": {
@@ -340,7 +309,6 @@ with tab1:
                     max_value=100,
                     value=default_s_percentage,
                     key=f"{process}_{input_name}_s",
-                    on_change=update_estimates
                 )
                 m_percentage = col3.number_input(
                     f"M%",
@@ -348,7 +316,6 @@ with tab1:
                     max_value=100,
                     value=default_m_percentage,
                     key=f"{process}_{input_name}_m",
-                    on_change=update_estimates
                 )
                 l_percentage = col4.number_input(
                     f"L%",
@@ -356,7 +323,6 @@ with tab1:
                     max_value=100,
                     value=default_l_percentage,
                     key=f"{process}_{input_name}_l",
-                    on_change=update_estimates
                 )
 
                 if s_percentage + m_percentage + l_percentage == 100:
@@ -451,21 +417,18 @@ with tab2:
                     min_value=0,
                     value=sizes["S"],
                     step=1,
-                    on_change=update_estimates
                 ),
                 "M": col3.number_input(
                     f"Medium ({category.capitalize()})",
                     min_value=0,
                     value=sizes["M"],
                     step=1,
-                    on_change=update_estimates
                 ),
                 "L": col4.number_input(
                     f"Large ({category.capitalize()})",
                     min_value=0,
                     value=sizes["L"],
                     step=1,
-                    on_change=update_estimates
                 ),
             }
 
