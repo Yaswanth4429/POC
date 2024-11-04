@@ -97,37 +97,6 @@ if "selected_project_type" not in st.session_state:
 if "effort_breakdown" not in st.session_state:
     st.session_state.effort_breakdown = default_percentages
 
-def update_estimates():
-    st.session_state.effort_values.update(
-        default_effort_values[st.session_state["selected_project_type"]][st.session_state["selected_technology"]]
-    )
-    for process, inputs in process_mappings.items():
-        process_total = 0
-        for input_name, effort_key in inputs.items():
-            total_count = st.session_state[f"{process}_{input_name}_count"]
-            s_percentage = st.session_state[f"{process}_{input_name}_s"]
-            m_percentage = st.session_state[f"{process}_{input_name}_m"]
-            l_percentage = st.session_state[f"{process}_{input_name}_l"]
-            
-            # Recalculate estimates
-            s_count = total_count * (s_percentage / 100)
-            m_count = total_count * (m_percentage / 100)
-            l_count = total_count * (l_percentage / 100)
-            effort = (
-                s_count * st.session_state.effort_values[effort_key]["S"]
-                + m_count * st.session_state.effort_values[effort_key]["M"]
-                + l_count * st.session_state.effort_values[effort_key]["L"]
-            )
-
-            st.session_state.estimate_values[process][input_name] = {
-                "Effort": effort,
-                "Total Count": total_count,
-                "S%": s_percentage,
-                "M%": m_percentage,
-                "L%": l_percentage,
-            }
-
-
 # Default configurations for each tech and project type
 default_effort_values = {
     "New": {
@@ -332,7 +301,6 @@ with tab1:
                     step=1,
                     value=default_total_count,
                     key=f"{process}_{input_name}_count",
-                    on_change=update_estimates
                 )
                 s_percentage = col2.number_input(
                     f"S%",
@@ -340,7 +308,6 @@ with tab1:
                     max_value=100,
                     value=default_s_percentage,
                     key=f"{process}_{input_name}_s",
-                    on_change=update_estimates
                 )
                 m_percentage = col3.number_input(
                     f"M%",
@@ -348,7 +315,6 @@ with tab1:
                     max_value=100,
                     value=default_m_percentage,
                     key=f"{process}_{input_name}_m",
-                    on_change=update_estimates
                 )
                 l_percentage = col4.number_input(
                     f"L%",
@@ -356,7 +322,6 @@ with tab1:
                     max_value=100,
                     value=default_l_percentage,
                     key=f"{process}_{input_name}_l",
-                    on_change=update_estimates
                 )
 
                 if s_percentage + m_percentage + l_percentage == 100:
@@ -441,31 +406,31 @@ with tab2:
     st.subheader(
         f"Effort Multipliers for {selected_project_type} Project on {selected_technology}"
     )
+    st.session_state.effort_values.update(
+        default_effort_values[st.session_state["selected_project_type"]][st.session_state["selected_technology"]]
+    )
     for category, sizes in st.session_state.effort_values.items():
         with st.container():
-            col1, col2, col3, col4 = st.columns([1.5, 1, 1, 1])
+            col1, col2, col3, col4 = st.columns([1, 1, 1, 1])
             col1.write(category.capitalize())
             st.session_state.effort_values[category] = {
                 "S": col2.number_input(
-                    f"Small ({category.capitalize()})",
+                    f"Small",
                     min_value=0,
                     value=sizes["S"],
                     step=1,
-                    on_change=update_estimates
                 ),
                 "M": col3.number_input(
-                    f"Medium ({category.capitalize()})",
+                    f"Medium",
                     min_value=0,
                     value=sizes["M"],
                     step=1,
-                    on_change=update_estimates
                 ),
                 "L": col4.number_input(
-                    f"Large ({category.capitalize()})",
+                    f"Large",
                     min_value=0,
                     value=sizes["L"],
                     step=1,
-                    on_change=update_estimates
                 ),
             }
 
