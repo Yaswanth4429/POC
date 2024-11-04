@@ -406,9 +406,6 @@ with tab2:
     st.subheader(
         f"Effort Multipliers for {selected_project_type} Project on {selected_technology}"
     )
-    st.session_state.effort_values.update(
-        default_effort_values[st.session_state["selected_project_type"]][st.session_state["selected_technology"]]
-    )
     for category, sizes in st.session_state.effort_values.items():
         with st.container():
             col1, col2, col3, col4 = st.columns([1, 1, 1, 1])
