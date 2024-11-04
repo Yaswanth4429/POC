@@ -301,7 +301,6 @@ with tab1:
                     step=1,
                     value=default_total_count,
                     key=f"{process}_{input_name}_count",
-                    on_change=update_estimates
                 )
                 s_percentage = col2.number_input(
                     f"S%",
