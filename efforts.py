@@ -98,6 +98,9 @@ if "effort_breakdown" not in st.session_state:
     st.session_state.effort_breakdown = default_percentages
 
 def update_estimates():
+    st.session_state.effort_values.update(
+        default_effort_values[st.session_state["selected_project_type"]][st.session_state["selected_technology"]]
+    )
     for process, inputs in process_mappings.items():
         process_total = 0
         for input_name, effort_key in inputs.items():
