@@ -252,6 +252,7 @@ def export_to_json():
         "ProjectType": selected_project_type,
         "EffortInputs": st.session_state.effort_values,
         "Estimates": st.session_state.estimate_values,
+        "Parameters": st.session_state.effort_breakdown,
     }
     json_data = json.dumps(data, indent=4)
     st.download_button(
@@ -296,26 +297,6 @@ with tab2:
                     step=1,
                 ),
             }
-
-with tab3:
-    st.header("Phase-Wise Effort Breakdown")
-    st.write(
-        "Enter the percentage allocation for each phase (total should add up to 100%)."
-    )
-    total_allocation = 0
-    for phase in sdlc_phases:
-        st.session_state.effort_breakdown[phase] = st.number_input(
-            f"{phase} (%)",
-            min_value=0,
-            max_value=100,
-            value=st.session_state.effort_breakdown[phase],
-        )
-        total_allocation += st.session_state.effort_breakdown[phase]
-
-    if total_allocation != 100:
-        st.warning(
-            f"The total allocation is {total_allocation}%. Please ensure it adds up to 100%."
-        )
 
 with tab1:
     st.header("Estimates")
@@ -452,6 +433,26 @@ with tab1:
         title="Effort Waterfall Chart", yaxis_title="Effort (hours)", showlegend=False
     )
     st.plotly_chart(fig)
+
+with tab3:
+    st.header("Phase-Wise Effort Breakdown")
+    st.write(
+        "Enter the percentage allocation for each phase (total should add up to 100%)."
+    )
+    total_allocation = 0
+    for phase in sdlc_phases:
+        st.session_state.effort_breakdown[phase] = st.number_input(
+            f"{phase} (%)",
+            min_value=0,
+            max_value=100,
+            value=st.session_state.effort_breakdown[phase],
+        )
+        total_allocation += st.session_state.effort_breakdown[phase]
+
+    if total_allocation != 100:
+        st.warning(
+            f"The total allocation is {total_allocation}%. Please ensure it adds up to 100%."
+        )
 
 # Download button for exporting JSON
 export_to_json()
