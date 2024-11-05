@@ -266,6 +266,57 @@ def export_to_json():
 # Tabs for Effort Inputs and Estimates
 tab1, tab2, tab3 = st.tabs(["Estimates", "Effort Inputs", "Parameters"])
 
+
+with tab2:
+    st.header("Configure Effort Multipliers (hours per unit)")
+    st.subheader(
+        f"Effort Multipliers for {selected_project_type} Project on {selected_technology}"
+    )
+    for category, sizes in st.session_state.effort_values.items():
+        with st.container():
+            col1, col2, col3, col4 = st.columns([1.5, 1, 1, 1])
+            col1.write(category.capitalize())
+            st.session_state.effort_values[category] = {
+                "S": col2.number_input(
+                    f"Small ({category.capitalize()})",
+                    min_value=0,
+                    value=sizes["S"],
+                    step=1,
+                ),
+                "M": col3.number_input(
+                    f"Medium ({category.capitalize()})",
+                    min_value=0,
+                    value=sizes["M"],
+                    step=1,
+                ),
+                "L": col4.number_input(
+                    f"Large ({category.capitalize()})",
+                    min_value=0,
+                    value=sizes["L"],
+                    step=1,
+                ),
+            }
+
+with tab3:
+    st.header("Phase-Wise Effort Breakdown")
+    st.write(
+        "Enter the percentage allocation for each phase (total should add up to 100%)."
+    )
+    total_allocation = 0
+    for phase in sdlc_phases:
+        st.session_state.effort_breakdown[phase] = st.number_input(
+            f"{phase} (%)",
+            min_value=0,
+            max_value=100,
+            value=st.session_state.effort_breakdown[phase],
+        )
+        total_allocation += st.session_state.effort_breakdown[phase]
+
+    if total_allocation != 100:
+        st.warning(
+            f"The total allocation is {total_allocation}%. Please ensure it adds up to 100%."
+        )
+
 with tab1:
     st.header("Estimates")
     total_estimate = {}
@@ -401,56 +452,6 @@ with tab1:
         title="Effort Waterfall Chart", yaxis_title="Effort (hours)", showlegend=False
     )
     st.plotly_chart(fig)
-
-with tab2:
-    st.header("Configure Effort Multipliers (hours per unit)")
-    st.subheader(
-        f"Effort Multipliers for {selected_project_type} Project on {selected_technology}"
-    )
-    for category, sizes in st.session_state.effort_values.items():
-        with st.container():
-            col1, col2, col3, col4 = st.columns([1.5, 1, 1, 1])
-            col1.write(category.capitalize())
-            st.session_state.effort_values[category] = {
-                "S": col2.number_input(
-                    f"Small ({category.capitalize()})",
-                    min_value=0,
-                    value=sizes["S"],
-                    step=1,
-                ),
-                "M": col3.number_input(
-                    f"Medium ({category.capitalize()})",
-                    min_value=0,
-                    value=sizes["M"],
-                    step=1,
-                ),
-                "L": col4.number_input(
-                    f"Large ({category.capitalize()})",
-                    min_value=0,
-                    value=sizes["L"],
-                    step=1,
-                ),
-            }
-
-with tab3:
-    st.header("Phase-Wise Effort Breakdown")
-    st.write(
-        "Enter the percentage allocation for each phase (total should add up to 100%)."
-    )
-    total_allocation = 0
-    for phase in sdlc_phases:
-        st.session_state.effort_breakdown[phase] = st.number_input(
-            f"{phase} (%)",
-            min_value=0,
-            max_value=100,
-            value=st.session_state.effort_breakdown[phase],
-        )
-        total_allocation += st.session_state.effort_breakdown[phase]
-
-    if total_allocation != 100:
-        st.warning(
-            f"The total allocation is {total_allocation}%. Please ensure it adds up to 100%."
-        )
 
 # Download button for exporting JSON
 export_to_json()
