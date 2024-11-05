@@ -88,11 +88,30 @@ if mode == "Start New" or "effort_values" not in st.session_state:
         st.session_state["selected_technology"] = "Snowflake"  # Default technology
     if "selected_project_type" not in st.session_state:
         st.session_state["selected_project_type"] = "New"  # Default project type
+# Sidebar for project type and technology selection
+st.sidebar.header("Project Configuration")
+technologies = ["Snowflake", "Databricks", "MDP", "Powered By Excel(EV2)"]
+project_types = ["New", "Upgrade"]
+# Sidebar for project type and technology selection, reflecting session state values
+selected_technology = st.sidebar.selectbox(
+    "Select Technology",
+    technologies,
+    index=technologies.index(st.session_state["selected_technology"])
+)
+selected_project_type = st.sidebar.selectbox(
+    "Project Type",
+    project_types,
+    index=project_types.index(st.session_state["selected_project_type"])
+)
 
 if "selected_technology" not in st.session_state:
     st.session_state["selected_technology"] = "Snowflake"  # or any default technology
+else:
+    st.session_state["selected_technology"]=selected_technology
 if "selected_project_type" not in st.session_state:
     st.session_state["selected_project_type"] = "New"  # or any default project type
+else:
+    st.session_state["selected_project_type"]=selected_project_type
 # Mapping of processes and inputs to effort keys
 if "effort_breakdown" not in st.session_state:
     st.session_state.effort_breakdown = default_percentages
@@ -205,8 +224,6 @@ if mode == "Start New":
     st.session_state.effort_values.update(
         default_effort_values[st.session_state["selected_project_type"]][st.session_state["selected_technology"]]
     )
-
-
 def import_from_json(uploaded_file):
     try:
         data = json.load(uploaded_file)
@@ -244,21 +261,6 @@ def export_to_json():
         mime="application/json",
     )
 
-# Sidebar for project type and technology selection
-st.sidebar.header("Project Configuration")
-technologies = ["Snowflake", "Databricks", "MDP", "Powered By Excel(EV2)"]
-project_types = ["New", "Upgrade"]
-# Sidebar for project type and technology selection, reflecting session state values
-selected_technology = st.sidebar.selectbox(
-    "Select Technology",
-    technologies,
-    index=technologies.index(st.session_state["selected_technology"])
-)
-selected_project_type = st.sidebar.selectbox(
-    "Project Type",
-    project_types,
-    index=project_types.index(st.session_state["selected_project_type"])
-)
 
 
 # Tabs for Effort Inputs and Estimates
