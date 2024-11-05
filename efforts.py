@@ -325,6 +325,11 @@ with tab1:
                     .get(input_name, {})
                     .get("L%", 30)
                 )
+                default_comments = (
+                    st.session_state.estimate_values.get(process, {})
+                    .get(input_name, {})
+                    .get("Comments", "")
+                )
 
                 col1, col2, col3, col4 = st.columns([1, 1, 1, 1])
                 total_count = col1.number_input(
