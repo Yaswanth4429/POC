@@ -88,6 +88,20 @@ if mode == "Start New" or "effort_values" not in st.session_state:
         st.session_state["selected_technology"] = "Snowflake"  # Default technology
     if "selected_project_type" not in st.session_state:
         st.session_state["selected_project_type"] = "New"  # Default project type
+def import_from_json(uploaded_file):
+    try:
+        data = json.load(uploaded_file)
+        st.session_state["selected_technology"] = data.get("Technology", st.session_state["selected_technology"])
+        st.session_state["selected_project_type"] = data.get("ProjectType", st.session_state["selected_project_type"])
+        
+        st.session_state.effort_values = data.get("EffortInputs", st.session_state.effort_values)
+        st.session_state.estimate_values = data.get("Estimates", st.session_state.estimate_values)
+        
+        st.success("JSON configuration imported successfully!")
+    except json.JSONDecodeError:
+        st.error("The uploaded file is not a valid JSON.")
+    return st.session_state.effort_values, st.session_state.estimate_values
+
 # Sidebar for project type and technology selection
 st.sidebar.header("Project Configuration")
 technologies = ["Snowflake", "Databricks", "MDP", "Powered By Excel(EV2)"]
@@ -223,19 +237,6 @@ default_effort_values = {
 st.session_state.effort_values.update(
         default_effort_values[st.session_state["selected_project_type"]][st.session_state["selected_technology"]]
     )
-def import_from_json(uploaded_file):
-    try:
-        data = json.load(uploaded_file)
-        st.session_state["selected_technology"] = data.get("Technology", st.session_state["selected_technology"])
-        st.session_state["selected_project_type"] = data.get("ProjectType", st.session_state["selected_project_type"])
-        
-        st.session_state.effort_values = data.get("EffortInputs", st.session_state.effort_values)
-        st.session_state.estimate_values = data.get("Estimates", st.session_state.estimate_values)
-        
-        st.success("JSON configuration imported successfully!")
-    except json.JSONDecodeError:
-        st.error("The uploaded file is not a valid JSON.")
-    return st.session_state.effort_values, st.session_state.estimate_values
 
 
 # File uploader for JSON import if mode is "Import JSON"
