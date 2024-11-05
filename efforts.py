@@ -242,9 +242,10 @@ default_effort_values = {
     },
 }
 # Load default effort values based on selection
-st.session_state.effort_values.update(
-        default_effort_values[st.session_state["selected_project_type"]][st.session_state["selected_technology"]]
-    )
+if mode=="Start New":
+    st.session_state.effort_values.update(
+            default_effort_values[st.session_state["selected_project_type"]][st.session_state["selected_technology"]]
+        )
 
 # Export JSON function
 def export_to_json():
