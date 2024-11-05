@@ -96,6 +96,7 @@ def import_from_json(uploaded_file):
         
         st.session_state.effort_values = data.get("EffortInputs", st.session_state.effort_values)
         st.session_state.estimate_values = data.get("Estimates", st.session_state.estimate_values)
+        st.session_state.estimate_values = data.get("Parameters", st.session_state.effort_breakdown)
         
         st.success("JSON configuration imported successfully!")
     except json.JSONDecodeError:
