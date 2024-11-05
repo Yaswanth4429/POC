@@ -328,7 +328,7 @@ with tab1:
                 default_comments = (
                     st.session_state.estimate_values.get(process, {})
                     .get(input_name, {})
-                    .get("Comments", "")
+                    .get("Comments", "Hi")
                 )
 
                 col1, col2, col3, col4 = st.columns([1, 1, 1, 1])
