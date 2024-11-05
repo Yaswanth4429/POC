@@ -220,8 +220,7 @@ default_effort_values = {
     },
 }
 # Load default effort values based on selection
-if mode == "Start New":
-    st.session_state.effort_values.update(
+st.session_state.effort_values.update(
         default_effort_values[st.session_state["selected_project_type"]][st.session_state["selected_technology"]]
     )
 def import_from_json(uploaded_file):
