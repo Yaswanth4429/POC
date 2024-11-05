@@ -102,6 +102,13 @@ def import_from_json(uploaded_file):
         st.error("The uploaded file is not a valid JSON.")
     return st.session_state.effort_values, st.session_state.estimate_values
 
+
+# File uploader for JSON import if mode is "Import JSON"
+if mode == "Import JSON":
+    uploaded_file = st.sidebar.file_uploader("Upload Configuration JSON", type=["json"])
+    if uploaded_file is not None:
+        effort_values, estimate_values = import_from_json(uploaded_file)
+
 # Sidebar for project type and technology selection
 st.sidebar.header("Project Configuration")
 technologies = ["Snowflake", "Databricks", "MDP", "Powered By Excel(EV2)"]
@@ -237,13 +244,6 @@ default_effort_values = {
 st.session_state.effort_values.update(
         default_effort_values[st.session_state["selected_project_type"]][st.session_state["selected_technology"]]
     )
-
-
-# File uploader for JSON import if mode is "Import JSON"
-if mode == "Import JSON":
-    uploaded_file = st.sidebar.file_uploader("Upload Configuration JSON", type=["json"])
-    if uploaded_file is not None:
-        effort_values, estimate_values = import_from_json(uploaded_file)
 
 # Export JSON function
 def export_to_json():
