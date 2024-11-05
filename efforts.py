@@ -368,7 +368,7 @@ with tab1:
 
                     st.write(f"Estimated Effort for {input_name}: {effort:.2f} hours")
                     # Add a Comments textbox
-                    comments = st.text_area(f"Comments for {input_name}", key=f"{process}_{input_name}_comments",value=st.text_area)
+                    comments = st.text_area(f"Comments for {input_name}", key=f"{process}_{input_name}_comments",value="")
                 
                     process_total += effort
 
