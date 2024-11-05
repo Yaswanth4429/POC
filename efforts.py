@@ -228,29 +228,6 @@ if mode == "Import JSON":
     if uploaded_file is not None:
         effort_values, estimate_values = import_from_json(uploaded_file)
 
-def calculate_estimates():
-    total_estimate = {}
-    for process, inputs in process_mappings.items():
-        process_total = 0
-        for input_name, effort_key in inputs.items():
-            total_count = st.session_state.estimate_values.get(process, {}).get(input_name, {}).get("Total Count", 0)
-            s_percentage = st.session_state.estimate_values.get(process, {}).get(input_name, {}).get("S%", 0)
-            m_percentage = st.session_state.estimate_values.get(process, {}).get(input_name, {}).get("M%", 0)
-            l_percentage = st.session_state.estimate_values.get(process, {}).get(input_name, {}).get("L%", 0)
-
-            if s_percentage + m_percentage + l_percentage == 100:
-                s_count = total_count * (s_percentage / 100)
-                m_count = total_count * (m_percentage / 100)
-                l_count = total_count * (l_percentage / 100)
-
-                effort = (
-                    s_count * st.session_state.effort_values[effort_key]["S"]
-                    + m_count * st.session_state.effort_values[effort_key]["M"]
-                    + l_count * st.session_state.effort_values[effort_key]["L"]
-                )
-                process_total += effort
-        total_estimate[process] = process_total
-    return total_estimate
 # Export JSON function
 def export_to_json():
     data = {
@@ -289,200 +266,172 @@ tab1, tab2, tab3 = st.tabs(["Estimates", "Effort Inputs", "Parameters"])
 
 with tab1:
     st.header("Estimates")
-    # Calculate estimates initially
-    total_estimate = calculate_estimates()
+    total_estimate = {}
+    for process, inputs in process_mappings.items():
+        with st.expander(f"{process}"):
+            process_total = 0
+            for input_name, effort_key in inputs.items():
+                st.subheader(input_name)
+                default_total_count = (
+                    st.session_state.estimate_values.get(process, {})
+                    .get(input_name, {})
+                    .get("Total Count", 0)
+                )
+                default_s_percentage = (
+                    st.session_state.estimate_values.get(process, {})
+                    .get(input_name, {})
+                    .get("S%", 40)
+                )
+                default_m_percentage = (
+                    st.session_state.estimate_values.get(process, {})
+                    .get(input_name, {})
+                    .get("M%", 30)
+                )
+                default_l_percentage = (
+                    st.session_state.estimate_values.get(process, {})
+                    .get(input_name, {})
+                    .get("L%", 30)
+                )
 
-    # Display estimates in the UI
+                col1, col2, col3, col4 = st.columns([1, 1, 1, 1])
+                total_count = col1.number_input(
+                    f"Total",
+                    min_value=0,
+                    step=1,
+                    value=default_total_count,
+                    key=f"{process}_{input_name}_count",
+                )
+                s_percentage = col2.number_input(
+                    f"S%",
+                    min_value=0,
+                    max_value=100,
+                    value=default_s_percentage,
+                    key=f"{process}_{input_name}_s",
+                )
+                m_percentage = col3.number_input(
+                    f"M%",
+                    min_value=0,
+                    max_value=100,
+                    value=default_m_percentage,
+                    key=f"{process}_{input_name}_m",
+                )
+                l_percentage = col4.number_input(
+                    f"L%",
+                    min_value=0,
+                    max_value=100,
+                    value=default_l_percentage,
+                    key=f"{process}_{input_name}_l",
+                )
+
+                if s_percentage + m_percentage + l_percentage == 100:
+                    s_count = total_count * (s_percentage / 100)
+                    m_count = total_count * (m_percentage / 100)
+                    l_count = total_count * (l_percentage / 100)
+
+                    effort = (
+                        s_count * st.session_state.effort_values[effort_key]["S"]
+                        + m_count * st.session_state.effort_values[effort_key]["M"]
+                        + l_count * st.session_state.effort_values[effort_key]["L"]
+                    )
+
+                    st.write(f"Estimated Effort for {input_name}: {effort:.2f} hours")
+                    # Add a Comments textbox
+                    comments = st.text_area(f"Comments for {input_name}", key=f"{process}_{input_name}_comments")
+                
+                    process_total += effort
+
+                    if process not in st.session_state.estimate_values:
+                        st.session_state.estimate_values[process] = {}
+                    st.session_state.estimate_values[process][input_name] = {
+                        "Total Count": total_count,
+                        "S%": s_percentage,
+                        "M%": m_percentage,
+                        "L%": l_percentage,
+                        "Effort": effort,
+                        "Comments": comments,
+                    }
+                else:
+                    st.error("The percentages must add up to 100.")
+            total_estimate[process] = process_total
+            st.write(f"Total Estimated Effort for {process}: {process_total:.2f} hours")
+
     st.write("### Summary of Estimated Efforts by Process")
     summary_df = pd.DataFrame(
         list(total_estimate.items()), columns=["Process", "Most Likely Estimate"]
     )
+    total_effort = summary_df["Most Likely Estimate"].sum()
+    total_row = pd.DataFrame(
+        [{"Process": "Total", "Most Likely Estimate": total_effort}]
+    )
+    summary_df = pd.concat([summary_df, total_row], ignore_index=True)
+    summary_df["Optimistic Estimate"] = summary_df["Most Likely Estimate"] * 0.9
+    summary_df["Pessimistic Estimate"] = summary_df["Most Likely Estimate"] * 1.15
+    summary_df["PERT Estimate"] = (
+        summary_df["Optimistic Estimate"]
+        + 4 * summary_df["Most Likely Estimate"]
+        + summary_df["Pessimistic Estimate"]
+    ) / 6
+    phase_summary_df = summary_df[["Process", "PERT Estimate"]]
+    total_allocation = phase_summary_df["PERT Estimate"] / (
+        st.session_state.effort_breakdown["Develop"] / 100
+    )
+    for phase in sdlc_phases:
+        phase_summary_df[f"{phase}"] = total_allocation * (
+            st.session_state.effort_breakdown[phase] / 100
+        )
+    phase_summary_df["Total Effort"] = total_allocation
+
     st.table(summary_df)
+    st.table(phase_summary_df)
+
+
+    st.write("### Waterfall Chart of Efforts by Process")
+    fig = go.Figure(
+        go.Waterfall(
+            x=summary_df["Process"],
+            y=summary_df["PERT Estimate"],
+            measure=["relative"] * (len(summary_df) - 1) + ["total"],
+            name="Effort Breakdown",
+            text=summary_df["PERT Estimate"].apply(lambda x: f"{x:.2f}"),
+        )
+    )
+    fig.update_layout(
+        title="Effort Waterfall Chart", yaxis_title="Effort (hours)", showlegend=False
+    )
+    st.plotly_chart(fig)
 
 with tab2:
     st.header("Configure Effort Multipliers (hours per unit)")
     st.subheader(
         f"Effort Multipliers for {selected_project_type} Project on {selected_technology}"
     )
+    st.session_state.effort_values.update(
+        default_effort_values[st.session_state["selected_project_type"]][st.session_state["selected_technology"]]
+    )
     for category, sizes in st.session_state.effort_values.items():
         with st.container():
             col1, col2, col3, col4 = st.columns([1.5, 1, 1, 1])
             col1.write(category.capitalize())
-            # Update session state with the new input values
-            st.session_state.effort_values[category]['S'] = col2.number_input("Small", value=sizes['S'])
-            st.session_state.effort_values[category]['M'] = col3.number_input("Medium", value=sizes['M'])
-            st.session_state.effort_values[category]['L'] = col4.number_input("Large", value=sizes['L'])
-
-    # After updating effort values, recalculate estimates
-    total_estimate = calculate_estimates()
-# with tab1:
-#     st.header("Estimates")
-#     total_estimate = {}
-#     for process, inputs in process_mappings.items():
-#         with st.expander(f"{process}"):
-#             process_total = 0
-#             for input_name, effort_key in inputs.items():
-#                 st.subheader(input_name)
-#                 default_total_count = (
-#                     st.session_state.estimate_values.get(process, {})
-#                     .get(input_name, {})
-#                     .get("Total Count", 0)
-#                 )
-#                 default_s_percentage = (
-#                     st.session_state.estimate_values.get(process, {})
-#                     .get(input_name, {})
-#                     .get("S%", 40)
-#                 )
-#                 default_m_percentage = (
-#                     st.session_state.estimate_values.get(process, {})
-#                     .get(input_name, {})
-#                     .get("M%", 30)
-#                 )
-#                 default_l_percentage = (
-#                     st.session_state.estimate_values.get(process, {})
-#                     .get(input_name, {})
-#                     .get("L%", 30)
-#                 )
-
-#                 col1, col2, col3, col4 = st.columns([1, 1, 1, 1])
-#                 total_count = col1.number_input(
-#                     f"Total",
-#                     min_value=0,
-#                     step=1,
-#                     value=default_total_count,
-#                     key=f"{process}_{input_name}_count",
-#                 )
-#                 s_percentage = col2.number_input(
-#                     f"S%",
-#                     min_value=0,
-#                     max_value=100,
-#                     value=default_s_percentage,
-#                     key=f"{process}_{input_name}_s",
-#                 )
-#                 m_percentage = col3.number_input(
-#                     f"M%",
-#                     min_value=0,
-#                     max_value=100,
-#                     value=default_m_percentage,
-#                     key=f"{process}_{input_name}_m",
-#                 )
-#                 l_percentage = col4.number_input(
-#                     f"L%",
-#                     min_value=0,
-#                     max_value=100,
-#                     value=default_l_percentage,
-#                     key=f"{process}_{input_name}_l",
-#                 )
-
-#                 if s_percentage + m_percentage + l_percentage == 100:
-#                     s_count = total_count * (s_percentage / 100)
-#                     m_count = total_count * (m_percentage / 100)
-#                     l_count = total_count * (l_percentage / 100)
-
-#                     effort = (
-#                         s_count * st.session_state.effort_values[effort_key]["S"]
-#                         + m_count * st.session_state.effort_values[effort_key]["M"]
-#                         + l_count * st.session_state.effort_values[effort_key]["L"]
-#                     )
-
-#                     st.write(f"Estimated Effort for {input_name}: {effort:.2f} hours")
-#                     # Add a Comments textbox
-#                     comments = st.text_area(f"Comments for {input_name}", key=f"{process}_{input_name}_comments")
-                
-#                     process_total += effort
-
-#                     if process not in st.session_state.estimate_values:
-#                         st.session_state.estimate_values[process] = {}
-#                     st.session_state.estimate_values[process][input_name] = {
-#                         "Total Count": total_count,
-#                         "S%": s_percentage,
-#                         "M%": m_percentage,
-#                         "L%": l_percentage,
-#                         "Effort": effort,
-#                         "Comments": comments,
-#                     }
-#                 else:
-#                     st.error("The percentages must add up to 100.")
-#             total_estimate[process] = process_total
-#             st.write(f"Total Estimated Effort for {process}: {process_total:.2f} hours")
-
-#     st.write("### Summary of Estimated Efforts by Process")
-#     summary_df = pd.DataFrame(
-#         list(total_estimate.items()), columns=["Process", "Most Likely Estimate"]
-#     )
-#     total_effort = summary_df["Most Likely Estimate"].sum()
-#     total_row = pd.DataFrame(
-#         [{"Process": "Total", "Most Likely Estimate": total_effort}]
-#     )
-#     summary_df = pd.concat([summary_df, total_row], ignore_index=True)
-#     summary_df["Optimistic Estimate"] = summary_df["Most Likely Estimate"] * 0.9
-#     summary_df["Pessimistic Estimate"] = summary_df["Most Likely Estimate"] * 1.15
-#     summary_df["PERT Estimate"] = (
-#         summary_df["Optimistic Estimate"]
-#         + 4 * summary_df["Most Likely Estimate"]
-#         + summary_df["Pessimistic Estimate"]
-#     ) / 6
-#     phase_summary_df = summary_df[["Process", "PERT Estimate"]]
-#     total_allocation = phase_summary_df["PERT Estimate"] / (
-#         st.session_state.effort_breakdown["Develop"] / 100
-#     )
-#     for phase in sdlc_phases:
-#         phase_summary_df[f"{phase}"] = total_allocation * (
-#             st.session_state.effort_breakdown[phase] / 100
-#         )
-#     phase_summary_df["Total Effort"] = total_allocation
-
-#     st.table(summary_df)
-#     st.table(phase_summary_df)
-
-
-#     st.write("### Waterfall Chart of Efforts by Process")
-#     fig = go.Figure(
-#         go.Waterfall(
-#             x=summary_df["Process"],
-#             y=summary_df["PERT Estimate"],
-#             measure=["relative"] * (len(summary_df) - 1) + ["total"],
-#             name="Effort Breakdown",
-#             text=summary_df["PERT Estimate"].apply(lambda x: f"{x:.2f}"),
-#         )
-#     )
-#     fig.update_layout(
-#         title="Effort Waterfall Chart", yaxis_title="Effort (hours)", showlegend=False
-#     )
-#     st.plotly_chart(fig)
-
-# with tab2:
-#     st.header("Configure Effort Multipliers (hours per unit)")
-#     st.subheader(
-#         f"Effort Multipliers for {selected_project_type} Project on {selected_technology}"
-#     )
-#     st.session_state.effort_values.update(
-#         default_effort_values[st.session_state["selected_project_type"]][st.session_state["selected_technology"]]
-#     )
-#     for category, sizes in st.session_state.effort_values.items():
-#         with st.container():
-#             col1, col2, col3, col4 = st.columns([1.5, 1, 1, 1])
-#             col1.write(category.capitalize())
-#             st.session_state.effort_values[category] = {
-#                 "S": col2.number_input(
-#                     f"Small ({category.capitalize()})",
-#                     min_value=0,
-#                     value=sizes["S"],
-#                     step=1,
-#                 ),
-#                 "M": col3.number_input(
-#                     f"Medium ({category.capitalize()})",
-#                     min_value=0,
-#                     value=sizes["M"],
-#                     step=1,
-#                 ),
-#                 "L": col4.number_input(
-#                     f"Large ({category.capitalize()})",
-#                     min_value=0,
-#                     value=sizes["L"],
-#                     step=1,
-#                 ),
-#             }
+            st.session_state.effort_values[category] = {
+                "S": col2.number_input(
+                    f"Small ({category.capitalize()})",
+                    min_value=0,
+                    value=sizes["S"],
+                    step=1,
+                ),
+                "M": col3.number_input(
+                    f"Medium ({category.capitalize()})",
+                    min_value=0,
+                    value=sizes["M"],
+                    step=1,
+                ),
+                "L": col4.number_input(
+                    f"Large ({category.capitalize()})",
+                    min_value=0,
+                    value=sizes["L"],
+                    step=1,
+                ),
+            }
 
 with tab3:
     st.header("Phase-Wise Effort Breakdown")
