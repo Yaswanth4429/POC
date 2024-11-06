@@ -423,7 +423,7 @@ with tab1:
     
     # summary_df=summary_df.style.format(precision=2)
     # phase_summary_df=phase_summary_df.style.format(precision=2)
-    st.table(summary_df)
+    st.table(summary_df.style.format(precision=2))
     st.table(phase_summary_df)
 
 
