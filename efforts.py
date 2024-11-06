@@ -421,10 +421,8 @@ with tab1:
     phase_summary_df["Total Effort"] = total_allocation
     phase_summary_df.drop(columns=["PERT Estimate"],inplace=True)
     
-    # summary_df=summary_df.style.format(precision=2)
-    # phase_summary_df=phase_summary_df.style.format(precision=2)
     st.table(summary_df.style.format(precision=2))
-    st.table(phase_summary_df)
+    st.table(phase_summary_df.style.format(precision=2))
 
 
     st.write("### Waterfall Chart of Efforts by Process")
