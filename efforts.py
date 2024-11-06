@@ -419,8 +419,8 @@ with tab1:
         )
     phase_summary_df["Total Effort"] = total_allocation
     phase_summary_df.drop(columns=["PERT Estimate"],inplace=True)
-    summary_df=summary_df.round(2)
-    phase_summary_df=phase_summary_df.round(2)
+    summary_df["Most Likely Estimate"]=summary_df["Most Likely Estimate"].round(2)
+    
     st.table(summary_df)
     st.table(phase_summary_df)
 
