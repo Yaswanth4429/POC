@@ -71,20 +71,7 @@ mode = st.sidebar.radio("Configuration Mode", ["Import JSON", "Start New"])
 
 # Initialize default values in session state if they don't exist
 if mode == "Start New" or "effort_values" not in st.session_state:
-    st.sidebar.header("Project Configuration")
-    technologies = ["Snowflake", "Databricks", "MDP", "Powered By Excel(EV2)"]
-    project_types = ["New", "Upgrade"]
-    # Sidebar for project type and technology selection, reflecting session state values
-    selected_technology = st.sidebar.selectbox(
-        "Select Technology",
-        technologies,
-        index=technologies.index(st.session_state["selected_technology"])
-    )
-    selected_project_type = st.sidebar.selectbox(
-        "Project Type",
-        project_types,
-        index=project_types.index(st.session_state["selected_project_type"])
-    )
+    
     st.session_state.effort_values = {
         key: {"S": 1, "M": 2, "L": 3} for key in effort_keys
     }
@@ -125,7 +112,20 @@ if mode == "Import JSON":
         effort_values, estimate_values, effort_breakdown = import_from_json(uploaded_file)
 
 # Sidebar for project type and technology selection
-
+st.sidebar.header("Project Configuration")
+    technologies = ["Snowflake", "Databricks", "MDP", "Powered By Excel(EV2)"]
+    project_types = ["New", "Upgrade"]
+    # Sidebar for project type and technology selection, reflecting session state values
+    selected_technology = st.sidebar.selectbox(
+        "Select Technology",
+        technologies,
+        index=technologies.index(st.session_state["selected_technology"])
+    )
+    selected_project_type = st.sidebar.selectbox(
+        "Project Type",
+        project_types,
+        index=project_types.index(st.session_state["selected_project_type"])
+    )
 
 if "selected_technology" not in st.session_state:
     st.session_state["selected_technology"] = "Snowflake"  # or any default technology
