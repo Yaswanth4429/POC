@@ -113,19 +113,19 @@ if mode == "Import JSON":
 
 # Sidebar for project type and technology selection
 st.sidebar.header("Project Configuration")
-    technologies = ["Snowflake", "Databricks", "MDP", "Powered By Excel(EV2)"]
-    project_types = ["New", "Upgrade"]
-    # Sidebar for project type and technology selection, reflecting session state values
-    selected_technology = st.sidebar.selectbox(
-        "Select Technology",
-        technologies,
-        index=technologies.index(st.session_state["selected_technology"])
-    )
-    selected_project_type = st.sidebar.selectbox(
-        "Project Type",
-        project_types,
-        index=project_types.index(st.session_state["selected_project_type"])
-    )
+technologies = ["Snowflake", "Databricks", "MDP", "Powered By Excel(EV2)"]
+project_types = ["New", "Upgrade"]
+# Sidebar for project type and technology selection, reflecting session state values
+selected_technology = st.sidebar.selectbox(
+    "Select Technology",
+    technologies,
+    index=technologies.index(st.session_state["selected_technology"])
+)
+selected_project_type = st.sidebar.selectbox(
+    "Project Type",
+    project_types,
+    index=project_types.index(st.session_state["selected_project_type"])
+)
 
 if "selected_technology" not in st.session_state:
     st.session_state["selected_technology"] = "Snowflake"  # or any default technology
