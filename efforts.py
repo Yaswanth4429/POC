@@ -275,22 +275,22 @@ with tab2:
     for category, sizes in st.session_state.effort_values.items():
         with st.container():
             col1, col2, col3, col4 = st.columns([1.5, 1, 1, 1])
-            col1.write(category)
+            col1.write(category.capitalize())
             st.session_state.effort_values[category] = {
                 "S": col2.number_input(
-                    f"Small",
+                    f"Small ({category.capitalize()})",
                     min_value=0,
                     value=sizes["S"],
                     step=1,
                 ),
                 "M": col3.number_input(
-                    f"Medium",
+                    f"Medium ({category.capitalize()})",
                     min_value=0,
                     value=sizes["M"],
                     step=1,
                 ),
                 "L": col4.number_input(
-                    f"Large",
+                    f"Large ({category.capitalize()})",
                     min_value=0,
                     value=sizes["L"],
                     step=1,
