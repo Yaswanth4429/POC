@@ -286,21 +286,21 @@ with tab2:
                     min_value=0,
                     value=sizes["S"],
                     step=1,
-                    label_visibility ("hidden"),
+                    label_visibility ("hidden")
                 ),
                 "M": col3.number_input(
                     f"Medium ({category.capitalize()})",
                     min_value=0,
                     value=sizes["M"],
                     step=1,
-                    label_visibility ("hidden"),
+                    label_visibility ("hidden")
                 ),
                 "L": col4.number_input(
                     f"Large ({category.capitalize()})",
                     min_value=0,
                     value=sizes["L"],
                     step=1,
-                    label_visibility ("hidden"),
+                    label_visibility ("hidden")
                 ),
             }
 
