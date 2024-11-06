@@ -71,7 +71,6 @@ mode = st.sidebar.radio("Configuration Mode", ["Import JSON", "Start New"])
 
 # Initialize default values in session state if they don't exist
 if mode == "Start New" or "effort_values" not in st.session_state:
-    
     st.session_state.effort_values = {
         key: {"S": 1, "M": 2, "L": 3} for key in effort_keys
     }
@@ -85,7 +84,6 @@ if mode == "Start New" or "effort_values" not in st.session_state:
             "Gold Layer",
         ]
     }
-    
     if "selected_technology" not in st.session_state:
         st.session_state["selected_technology"] = "Snowflake"  # Default technology
     if "selected_project_type" not in st.session_state:
@@ -277,8 +275,7 @@ with tab2:
     for category, sizes in st.session_state.effort_values.items():
         with st.container():
             col1, col2, col3, col4 = st.columns([1.5, 1, 1, 1])
-            #col1.write(category.capitalize())
-            col1.write(category)
+            col1.write(category.capitalize())
             st.session_state.effort_values[category] = {
                 "S": col2.number_input(
                     f"Small ({category.capitalize()})",
@@ -331,7 +328,7 @@ with tab1:
                 default_comments = (
                     st.session_state.estimate_values.get(process, {})
                     .get(input_name, {})
-                    .get("Comments")
+                    .get("Comments", "Hi")
                 )
 
                 col1, col2, col3, col4 = st.columns([1, 1, 1, 1])
@@ -377,7 +374,7 @@ with tab1:
 
                     st.write(f"Estimated Effort for {input_name}: {effort:.2f} hours")
                     # Add a Comments textbox
-                    comments = st.text_area(f"Comments", key=f"{process}_{input_name}_comments",value=default_comments)
+                    comments = st.text_area(f"Comments for {input_name}", key=f"{process}_{input_name}_comments",value=default_comments)
                 
                     process_total += effort
 
@@ -421,7 +418,9 @@ with tab1:
             st.session_state.effort_breakdown[phase] / 100
         )
     phase_summary_df["Total Effort"] = total_allocation
-
+    phase_summary_df.drop(columns=["PERT Estimate"],inplace=True)
+    summary_df=summary_df.round(2)
+    phase_summary_df=phase_summary_df.round(2)
     st.table(summary_df)
     st.table(phase_summary_df)
 
