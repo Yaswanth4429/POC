@@ -2,6 +2,7 @@ import streamlit as st
 import json
 import pandas as pd
 import plotly.graph_objects as go
+pd.set_option('display.precision', 2)
 
 # Define effort keys and their default values
 effort_keys = [
@@ -420,7 +421,7 @@ with tab1:
     phase_summary_df["Total Effort"] = total_allocation
     phase_summary_df.drop(columns=["PERT Estimate"],inplace=True)
     summary_df["Most Likely Estimate"] = pd.to_numeric(summary_df["Most Likely Estimate"], errors='coerce')
-    summary_df["Most Likely Estimate"] = summary_df["Most Likely Estimate"].apply(lambda x: round(x, 2) if pd.notnull(x) else x)
+    summary_df["Most Likely Estimate"] = summary_df["Most Likely Estimate"].round(2)
     
     st.table(summary_df)
     st.table(phase_summary_df)
