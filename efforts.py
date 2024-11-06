@@ -420,7 +420,7 @@ with tab1:
     phase_summary_df["Total Effort"] = total_allocation
     phase_summary_df.drop(columns=["PERT Estimate"],inplace=True)
     summary_df["Most Likely Estimate"] = pd.to_numeric(summary_df["Most Likely Estimate"], errors='coerce')
-    summary_df["Most Likely Estimate"] = summary_df["Most Likely Estimate"].round(2)
+    summary_df["Most Likely Estimate"] = summary_df["Most Likely Estimate"].apply(lambda x: round(x, 2) if pd.notnull(x) else x)
     
     st.table(summary_df)
     st.table(phase_summary_df)
